@@ -2,6 +2,7 @@ package org.example.backend.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.example.backend.enums.AttemptStatus;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
@@ -39,4 +40,8 @@ public class UserPracticeAttempt extends BaseEntity {
 
     @Column(name = "duration_seconds")
     private Integer durationSeconds = 0;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 30)
+    private AttemptStatus status = AttemptStatus.IN_PROGRESS;
 }

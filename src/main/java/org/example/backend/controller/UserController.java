@@ -8,10 +8,10 @@ import org.example.backend.enums.SuccessCode;
 import org.example.backend.service.UserService;
 import org.example.backend.util.ApiResponseUtil;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/users")
@@ -24,5 +24,11 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserResponse>> createUser(@RequestBody CreateUserRequest request) {
         return ApiResponseUtil.success(userService.createUser(request), SuccessCode.USER_CREATED);
     }
+    
+    @GetMapping
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers() {
+        List<UserResponse> users = userService.getUserAll();
+        return ApiResponseUtil.success(users, SuccessCode.USER_CREATED);
+    }
 }
-

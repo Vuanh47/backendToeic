@@ -4,6 +4,7 @@ import lombok.NoArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.example.backend.enums.AuthProvider;
+import org.example.backend.enums.UserRole;
 import org.example.backend.enums.UserStatus;
 import jakarta.persistence.*;
 import java.util.ArrayList;
@@ -48,6 +49,10 @@ public class User extends BaseEntity {
 
     @Column(name = "is_premium", nullable = false)
     private Boolean premium = false;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 20)
+    private UserRole role = UserRole.USER;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)

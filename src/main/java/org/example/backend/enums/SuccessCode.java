@@ -41,6 +41,7 @@ public enum SuccessCode {
     LOGIN_SUCCESS(1040, "Login successfully", HttpStatus.OK),
     ANALYZE_SUCCESS(1041, "Image analysis completed successfully", HttpStatus.OK),
     USER_CREATED(1042, "User created successfully", HttpStatus.CREATED),
+    LEARNING_PATH_ASSIGNED(1043, "Learning path assigned successfully", HttpStatus.OK),
 
     // --- Message codes (2001-2020) ---
     SEND_MESSAGE_SUCCESS(2001, "Message sent successfully", HttpStatus.OK),

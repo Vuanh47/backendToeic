@@ -30,7 +30,6 @@ public class ApiResponseUtil {
         return ResponseEntity.status(errorCode.getStatus()).body(response);
     }
 
-
     public static ResponseEntity<ApiResponse<Void>> success(SuccessCode successCode) {
         ApiResponse<Void> response = ApiResponse.<Void>builder()
                 .code(successCode.getCode())

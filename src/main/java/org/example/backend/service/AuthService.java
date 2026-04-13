@@ -1,7 +1,9 @@
 package org.example.backend.service;
 
 import lombok.RequiredArgsConstructor;
-import org.example.backend.dto.request.CreateUserRequest;
+import org.example.backend.dto.request.LoginRequest;
+import org.example.backend.dto.request.RegisterRequest;
+import org.example.backend.dto.response.AuthResponse;
 import org.example.backend.dto.response.UserResponse;
 import org.example.backend.entity.User;
 import org.example.backend.entity.UserProfile;
@@ -12,23 +14,28 @@ import org.example.backend.enums.UserStatus;
 import org.example.backend.exception.AppException;
 import org.example.backend.mapper.UserMapper;
 import org.example.backend.repository.UserRepository;
+import org.example.backend.security.JwtService;
+import org.example.backend.security.UserPrincipal;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+    private final JwtService jwtService;
     private final UserMapper userMapper;
 
     @Transactional
-    public UserResponse createUser(CreateUserRequest request) {
-        validateRequest(request);
+    public AuthResponse register(RegisterRequest request) {
+        validateRegisterRequest(request);
 
         String email = request.getEmail().trim().toLowerCase();
         if (userRepository.existsByEmail(email)) {
@@ -52,10 +59,45 @@ public class UserService {
         user.setProfile(profile);
 
         User savedUser = userRepository.save(user);
-        return userMapper.toResponse(savedUser);
+        return buildAuthResponse(savedUser);
     }
 
-    private void validateRequest(CreateUserRequest request) {
+    public AuthResponse login(LoginRequest request) {
+        if (request == null
+                || request.getEmail() == null || request.getEmail().isBlank()
+                || request.getPassword() == null || request.getPassword().isBlank()) {
+            throw new AppException(ErrorCode.INVALID_ACCOUNT_DATA);
+        }
+
+        String email = request.getEmail().trim().toLowerCase();
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, request.getPassword())
+            );
+        } catch (BadCredentialsException ex) {
+            throw new AppException(ErrorCode.LOGIN_FAIL);
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+
+        return buildAuthResponse(user);
+    }
+
+    private AuthResponse buildAuthResponse(User user) {
+        UserPrincipal principal = new UserPrincipal(user);
+        String token = jwtService.generateToken(principal);
+        UserResponse userResponse = userMapper.toResponse(user);
+
+        return AuthResponse.builder()
+                .accessToken(token)
+                .tokenType("Bearer")
+                .expiresIn(jwtService.getJwtExpirationMs())
+                .user(userResponse)
+                .build();
+    }
+
+    private void validateRegisterRequest(RegisterRequest request) {
         if (request == null
                 || request.getEmail() == null || request.getEmail().isBlank()
                 || request.getPassword() == null || request.getPassword().isBlank()) {
@@ -70,10 +112,5 @@ public class UserService {
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
     }
-
-    public List<UserResponse> getUserAll() {
-        List<User> users = userRepository.findAll();
-        return userMapper.toResponseList(users);
-    }
-
 }
+

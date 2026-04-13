@@ -66,8 +66,10 @@ public enum ErrorCode {
     AI_IMAGE_API_ERROR(5001, "Lỗi khi gọi AI Image Analysis API", HttpStatus.BAD_REQUEST),
     AI_IMAGE_API_NO_RESPONSE(5002, "AI Image Analysis API không trả về kết quả", HttpStatus.BAD_REQUEST),
 
-      MESSAGE_NOT_EXISTED(4005, "Message does not exist", HttpStatus.NOT_FOUND),
-    MESSAGE_CLASSIFICATION_NOT_EXISTED(4005, "Message classification does not exist", HttpStatus.NOT_FOUND);
+    MESSAGE_NOT_EXISTED(4005, "Message does not exist", HttpStatus.NOT_FOUND),
+    MESSAGE_CLASSIFICATION_NOT_EXISTED(4005, "Message classification does not exist", HttpStatus.NOT_FOUND),
+
+    LEARNING_PATH_NOT_FOUND(7001, "No active learning path found", HttpStatus.NOT_FOUND);
 
     int code;
     String message;

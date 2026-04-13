@@ -3,6 +3,7 @@ package org.example.backend.dto.response;
 import lombok.Data;
 import java.time.LocalDateTime;
 import org.example.backend.enums.AuthProvider;
+import org.example.backend.enums.UserRole;
 import org.example.backend.enums.UserStatus;
 @Data
 public class UserResponse {
@@ -15,6 +16,7 @@ public class UserResponse {
     private String currentLevel;
     private Integer targetScore;
     private Boolean premium;
+    private UserRole role;
     private UserStatus status;
     private Long profileId;
     private LocalDateTime createdAt;
